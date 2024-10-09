@@ -31,10 +31,6 @@ Enemigo.delete()
 Disparo.delete()
 game.setScore(0)
 basic.forever(function () {
-    music._playDefaultBackground(music.builtInPlayableMelody(Melodies.Blues), music.PlaybackMode.InBackground)
-    basic.pause(5000)
-})
-basic.forever(function () {
     if (Disparo.get(LedSpriteProperty.Y) == 0) {
         Disparo.delete()
     }
@@ -67,4 +63,8 @@ basic.forever(function () {
     if (Enemigo.isDeleted()) {
         Enemigo = game.createSprite(randint(0, 4), 0)
     }
+})
+basic.forever(function () {
+    music._playDefaultBackground(music.builtInPlayableMelody(Melodies.Blues), music.PlaybackMode.InBackground)
+    basic.pause(5000)
 })
