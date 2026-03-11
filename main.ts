@@ -1,19 +1,20 @@
 // hola
+// hello
 radio.onReceivedNumber(function (receivedNumber) {
-    if (receivedNumber == 100 && oponent_signal == 0) {
+    if (receivedNumber == 100000 && oponent_signal == 0) {
         oponent_signal = 1
-        radio.sendNumber(100)
+        radio.sendNumber(receivedNumber)
         basic.pause(100)
-    }
-    if (ac == 0) {
-        if (receivedNumber == 1) {
-            Player = 2
-            radio.sendNumber(Player)
-            ac = 1
-        } else if (receivedNumber == 2) {
+    } else if (ac == 0 && decided == 1 && current == 2) {
+        if (Number2 > receivedNumber) {
             Player = 1
-            radio.sendNumber(Player)
             ac = 1
+        } else if (Number2 < receivedNumber) {
+            Player = 2
+            ac = 1
+        } else {
+            Number2 = randint(0, 9999)
+            radio.sendNumber(Number2)
         }
     }
 })
@@ -51,8 +52,7 @@ input.onGesture(Gesture.LogoUp, function () {
     }
 })
 function SetPlayer () {
-    Player = randint(1, 2)
-    radio.sendNumber(Player)
+    radio.sendNumber(Number2)
 }
 input.onGesture(Gesture.ScreenDown, function () {
     if (Player == 1) {
@@ -110,6 +110,7 @@ radio.onReceivedValue(function (name, value) {
         Disparo2 = game.createSprite(value, 4)
     }
     if (name == "Enemigo") {
+        Enemigo.delete()
         Enemigo = game.createSprite(value, 0)
     }
     if (name == "Nave") {
@@ -164,10 +165,31 @@ let started = 0
 let Player = 0
 let ac = 0
 let oponent_signal = 0
+let Number2 = 0
 let current = 0
 radio.setGroup(1)
 current = 1
+Number2 = randint(0, 9999)
 basic.showNumber(1)
+basic.forever(function () {
+    if (started == 1) {
+        basic.pause(1000)
+        if (!(Enemigo.isDeleted()) && !(game.isPaused())) {
+            Enemigo.change(LedSpriteProperty.Y, 1)
+        }
+    }
+})
+basic.forever(function () {
+    if (started == 1) {
+        if (Enemigo.isDeleted()) {
+            if (Player == 1) {
+                basic.pause(randint(1000, 3000))
+                Enemigo = game.createSprite(randint(0, 4), 0)
+                radio.sendValue("Enemigo", Enemigo.get(LedSpriteProperty.X))
+            }
+        }
+    }
+})
 basic.forever(function () {
     if (started == 1) {
         if (!(Disparo.isDeleted())) {
@@ -230,7 +252,7 @@ basic.forever(function () {
 })
 basic.forever(function () {
     if (decided == 1 && oponent_signal == 0 && current == 2) {
-        radio.sendNumber(100)
+        radio.sendNumber(100000)
         basic.pause(200)
     } else if (decided == 1 && started == 0 && (current == 1 || oponent_signal == 1 && Player != 0 && ac == 1)) {
         if (current == 1) {
@@ -240,24 +262,5 @@ basic.forever(function () {
     } else if (decided == 1 && oponent_signal == 1 && started == 0 && (Player == 0 || ac == 0) && current == 2) {
         basic.pause(randint(0, 500))
         SetPlayer()
-    }
-})
-basic.forever(function () {
-    if (started == 1) {
-        basic.pause(1000)
-        if (!(Enemigo.isDeleted()) && !(game.isPaused())) {
-            Enemigo.change(LedSpriteProperty.Y, 1)
-        }
-    }
-})
-basic.forever(function () {
-    if (started == 1) {
-        if (Enemigo.isDeleted()) {
-            if (Player == 1) {
-                basic.pause(randint(1000, 3000))
-                Enemigo = game.createSprite(randint(0, 4), 0)
-                radio.sendValue("Enemigo", Enemigo.get(LedSpriteProperty.X))
-            }
-        }
     }
 })
